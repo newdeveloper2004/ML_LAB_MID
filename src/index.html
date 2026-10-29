@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ML Models</title>
+<style>
+  body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+  form { border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin-bottom: 2rem; }
+  label { display: block; margin: .5rem 0; }
+  input { width: 100%; padding: .4rem; box-sizing: border-box; }
+  button { margin-top: .75rem; padding: .5rem 1rem; }
+  .result { margin-top: .75rem; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>ML Models</h1>
+
+<form id="reg-form">
+  <h2>Regression: predict petal length</h2>
+  <label>Sepal length <input name="sepal_length" type="number" step="any" value="5.1" required></label>
+  <label>Sepal width <input name="sepal_width" type="number" step="any" value="3.5" required></label>
+  <label>Petal width <input name="petal_width" type="number" step="any" value="0.2" required></label>
+  <button type="submit">Predict</button>
+  <div class="result" id="reg-result"></div>
+</form>
+
+<form id="clf-form">
+  <h2>Classification: predict Iris species</h2>
+  <label>Sepal length <input name="sepal_length" type="number" step="any" value="5.1" required></label>
+  <label>Sepal width <input name="sepal_width" type="number" step="any" value="3.5" required></label>
+  <label>Petal length <input name="petal_length" type="number" step="any" value="1.4" required></label>
+  <label>Petal width <input name="petal_width" type="number" step="any" value="0.2" required></label>
+  <button type="submit">Predict</button>
+  <div class="result" id="clf-result"></div>
+</form>
+
+<script>
+function handle(formId, url, resultId, label) {
+  document.getElementById(formId).addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    const out = document.getElementById(resultId);
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      out.textContent = label + ": " + json.result;
+    } catch (err) {
+      out.textContent = "Error: could not reach the backend.";
+    }
+  });
+}
+handle("reg-form", "/predict/regression", "reg-result", "Predicted petal length");
+handle("clf-form", "/predict/classification", "clf-result", "Predicted species");
+</script>
+
+</body>
+</html>
